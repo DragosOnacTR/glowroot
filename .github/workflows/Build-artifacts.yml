@@ -79,7 +79,7 @@ jobs:
                            -Pjavadoc \
                            -Prelease \
                            -Dglowroot.build.commit=$(git rev-parse HEAD) \
-                           -DskipTests \
+                           -DskipTests -Dgpg.skip \
 
       - name: Create GitHub release
         env:
