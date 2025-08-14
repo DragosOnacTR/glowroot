@@ -1,0 +1,105 @@
+name: Build-artifacts.yml
+on:
+  workflow_dispatch:
+
+jobs:
+  release:   
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17 for build
+        uses: actions/setup-java@v4
+        with:
+          distribution: adopt
+          java-version: 17
+
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.cache/bower
+          key: release-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            release-
+
+      - name: Check that no javascript snapshot dependencies are used
+        run: |
+          bower_snapshot_dependencies=$(grep -e "trask.*#[0-9a-f]\{40\}" ui/bower.json || true)
+          
+          if [[ $bower_snapshot_dependencies ]]; then
+            echo
+            echo you need to update bower.json with tagged revisions of forked javascript repos:
+            echo
+            echo "$bower_snapshot_dependencies"
+            echo
+            echo "note: when tagging forked javascript repos, first commit -m \"Update generated files\" if necessary (e.g. needed for flot.tooltip)"
+            exit 1
+          fi
+
+      - name: Set versions
+        id: set-version
+        run: |
+          version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec \
+            | sed 's/-SNAPSHOT//')
+          echo "release-version=$version" >> $GITHUB_OUTPUT
+
+      - name: Set git user
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Update version and push to main
+        env:
+          VERSION: ${{ steps.set-version.outputs.release-version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sed -ri "s/glowroot-[0-9]+.[0-9]+.[0-9]+(-beta(\.[0-9]+)?)?-dist.zip/glowroot-$VERSION-dist.zip/g" README.md
+          sed -ri "s#https://github.com/DragosOnacTR/glowroot/releases/download/v[0-9]+.[0-9]+.[0-9]+(-beta(\.[0-9]+)?)?/#https://github.com/DragosOnacTR/glowroot/releases/download/v$VERSION/#" README.md
+
+          mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$VERSION
+
+          # git commit -a -m "Release version $VERSION"
+          # git push origin
+
+      - name: Release
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        run: |
+          # javadoc is needed here since deploy :glowroot-agent attaches the javadoc from :glowroot-agent-core
+          mvn clean install -pl :glowroot-agent,:glowroot-central -am \
+                            -Pjavadoc \
+                            -DskipTests
+
+          # gpg_key_id is needed for signing the rpm for the yum repository (see glowroot-central/pom.xml)
+         
+          mvn clean install -pl :glowroot-parent,:glowroot-agent-api,:glowroot-agent-plugin-api,:glowroot-agent-it-harness,:glowroot-agent,:glowroot-central \
+                           -Pjavadoc \
+                           -Prelease \
+                           -Dglowroot.build.commit=$(git rev-parse HEAD) \
+                           -DskipTests \
+
+      - name: Create GitHub release
+        env:
+          VERSION: ${{ steps.set-version.outputs.release-version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp agent/dist/target/glowroot-agent-$VERSION-dist.zip glowroot-$VERSION-dist.zip
+          cp central/target/glowroot-central-$VERSION-dist.zip glowroot-central-$VERSION-dist.zip
+          cp central/target/glowroot-central-$VERSION-dist.war glowroot-central-$VERSION-dist.war
+          if [[ $VERSION == *-beta* ]]; then
+            prerelease_option=--prerelease
+          fi
+          gh release create --target $GITHUB_REF_NAME \
+                            --title "Version $VERSION" \
+                            --generate-notes \
+                            $prerelease_option \
+                            --draft \
+                            v$VERSION \
+                            glowroot-$VERSION-dist.zip \
+                            glowroot-central-$VERSION-dist.zip \
+                            glowroot-central-$VERSION-dist.war
+
+                            
