@@ -60,7 +60,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           sed -ri "s/glowroot-[0-9]+.[0-9]+.[0-9]+(-beta(\.[0-9]+)?)?-dist.zip/glowroot-$VERSION-dist.zip/g" README.md
-          sed -ri "s#https://github.com/DragosOnacTR/glowroot/glowroot/releases/download/v[0-9]+.[0-9]+.[0-9]+(-beta(\.[0-9]+)?)?/#https://github.com/DragosOnacTR/glowroot/glowroot/releases/download/v$VERSION/#" README.md
+          sed -ri "s#https://github.com/DragosOnacTR//glowroot/releases/download/v[0-9]+.[0-9]+.[0-9]+(-beta(\.[0-9]+)?)?/#https://github.com/DragosOnacTR//glowroot/releases/download/v$VERSION/#" README.md
 
           mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$VERSION
 
@@ -153,16 +153,16 @@ jobs:
         run: |
           if [[ $VERSION != *-beta* ]]; then
             sed -ri "s/glowroot-[0-9]+.[0-9]+.[0-9]+-dist/glowroot-$VERSION-dist/g" "Agent-Installation-(with-Embedded-Collector).md"
-            sed -ri "s#https://github.com/DragosOnacTR/glowroot/glowroot/releases/download/v[0-9]+.[0-9]+.[0-9]+/#https://github.com/DragosOnacTR/glowroot/glowroot/releases/download/v$VERSION/#" "Agent-Installation-(with-Embedded-Collector).md"
+            sed -ri "s#https://github.com/DragosOnacTR//glowroot/releases/download/v[0-9]+.[0-9]+.[0-9]+/#https://github.com/DragosOnacTR//glowroot/releases/download/v$VERSION/#" "Agent-Installation-(with-Embedded-Collector).md"
 
             sed -ri "s/glowroot-[0-9]+.[0-9]+.[0-9]+-dist/glowroot-$VERSION-dist/g" "Agent-Installation-(for-Central-Collector).md"
-            sed -ri "s#https://github.com/DragosOnacTR/glowroot/glowroot/releases/download/v[0-9]+.[0-9]+.[0-9]+/#https://github.com/DragosOnacTR/glowroot/glowroot/releases/download/v$VERSION/#" "Agent-Installation-(for-Central-Collector).md"
+            sed -ri "s#https://github.com/DragosOnacTR//glowroot/releases/download/v[0-9]+.[0-9]+.[0-9]+/#https://github.com/DragosOnacTR//glowroot/releases/download/v$VERSION/#" "Agent-Installation-(for-Central-Collector).md"
 
             sed -ri "s/glowroot-central-[0-9]+.[0-9]+.[0-9]+-dist/glowroot-central-$VERSION-dist/g" Central-Collector-Installation.md
-            sed -ri "s#https://github.com/DragosOnacTR/glowroot/glowroot/releases/download/v[0-9]+.[0-9]+.[0-9]+/#https://github.com/DragosOnacTR/glowroot/glowroot/releases/download/v$VERSION/#" Central-Collector-Installation.md
+            sed -ri "s#https://github.com/DragosOnacTR//glowroot/releases/download/v[0-9]+.[0-9]+.[0-9]+/#https://github.com/DragosOnacTR//glowroot/releases/download/v$VERSION/#" Central-Collector-Installation.md
             sed -ri "s#glowroot/glowroot-central:[0-9]+.[0-9]+.[0-9]+#glowroot/glowroot-central:$VERSION#g" Central-Collector-Installation.md
 
-            sed -ri "s#https://github.com/DragosOnacTR/glowroot/glowroot/blob/v[0-9]+.[0-9]+.[0-9]+/central/src/main/resources/jgroups-#https://github.com/DragosOnacTR/glowroot/glowroot/blob/v$VERSION/central/src/main/resources/jgroups-#g" Central-Collector-Cluster.md
+            sed -ri "s#https://github.com/DragosOnacTR//glowroot/blob/v[0-9]+.[0-9]+.[0-9]+/central/src/main/resources/jgroups-#https://github.com/DragosOnacTR//glowroot/blob/v$VERSION/central/src/main/resources/jgroups-#g" Central-Collector-Cluster.md
 
             git commit -a -m "Release version $VERSION"
             git push origin
