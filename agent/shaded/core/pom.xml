@@ -343,7 +343,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
+      <!--<plugin>
         <groupId>com.github.wvengen</groupId>
         <artifactId>proguard-maven-plugin</artifactId>
         <executions>
@@ -367,28 +367,28 @@
             </option>
             <option>-keep class org.glowroot.agent.embedded.shaded.org.glowroot.** { *; }</option>
             <option>-keep class org.glowroot.agent.shaded.org.glowroot.common.** { *; }</option>
-            <!-- needed by custom collectors -->
+            <!- - needed by custom collectors - - >
             <option>-keep class org.glowroot.agent.shaded.org.glowroot.wire.api.** { *; }</option>
-            <!-- even though these classes will be stripped out in assembly plugin below, this will
-              retain the netty classes that they depend on -->
+            <!- - even though these classes will be stripped out in assembly plugin below, this will
+              retain the netty classes that they depend on - - >
             <option>
               -keep class org.glowroot.agent.shaded.io.netty.internal.tcnative.** { *; }
             </option>
-            <!-- needed since grpc 1.54.0 -->
+            <!- - needed since grpc 1.54.0 - - >
             <option>
               -keep class org.glowroot.agent.shaded.io.grpc.util.** { *; }
             </option>
-            <!-- even though these classes will be stripped out in assembly plugin below, this will
-              retain the jackson classes that they depend on -->
+            <!- - even though these classes will be stripped out in assembly plugin below, this will
+              retain the jackson classes that they depend on - - >
             <option>
               -keep class org.glowroot.agent.shaded.net.logstash.logback.** { *; }
             </option>
-            <!-- keep all logback appenders -->
+            <!- - keep all logback appenders - - >
             <option>
               -keep class * extends org.glowroot.agent.shaded.ch.qos.logback.** { *; }
             </option>
-            <!-- keep special enumeration methods (see "Processing enumeration classes" section at
-              http://proguard.sourceforge.net/manual/examples.html) -->
+            <!- - keep special enumeration methods (see "Processing enumeration classes" section at
+              http://proguard.sourceforge.net/manual/examples.html) - - >
             <option>
               -keepclassmembers,allowoptimization enum * {
               public static **[] values();
@@ -396,7 +396,7 @@
               static ** valueOf(java.lang.String);
               }
             </option>
-            <!-- needed for guava 33.1.0-jre / base -->
+            <!- - needed for guava 33.1.0-jre / base - - >
             <option>
               -keep class sun.misc.SharedSecrets {
               *** getJavaLangAccess(...);
@@ -428,7 +428,7 @@
               void finalizeReferent();
               }
             </option>
-            <!-- needed for guava 33.1.0-jre / cache -->
+            <!- - needed for guava 33.1.0-jre / cache - - >
             <option>
               -keepclassmembers class org.glowroot.agent.shaded.com.google.common.cache.Striped64 {
               *** base;
@@ -442,7 +442,7 @@
               }
               ]]>
             </option>
-            <!-- needed for guava 33.1.0-jre / collect -->
+            <!- - needed for guava 33.1.0-jre / collect - - >
             <option>
               -keepclassmembernames class org.glowroot.agent.shaded.com.google.common.collect.ImmutableMultimap {
               *** map;
@@ -471,7 +471,7 @@
               *** header;
               }
             </option>
-            <!-- needed for guava 33.1.0-jre / concurrent -->
+            <!- - needed for guava 33.1.0-jre / concurrent - - >
             <option>
               -keepclassmembers class org.glowroot.agent.shaded.com.google.common.util.concurrent.AbstractFuture** {
               *** waiters;
@@ -509,7 +509,7 @@
               static *** getCurrentEnvironment (...);
               }
             </option>
-            <!-- needed for guava 33.1.0-jre / hash -->
+            <!- - needed for guava 33.1.0-jre / hash - - >
             <option>
               -keepclassmembers class org.glowroot.agent.shaded.com.google.common.hash.Striped64 {
               *** base;
@@ -523,7 +523,7 @@
               }
               ]]>
             </option>
-            <!-- needed for guava 33.1.0-jre / io -->
+            <!- - needed for guava 33.1.0-jre / io - - >
             <option>
               -keep class java.lang.Throwable {
               *** addSuppressed(...);
@@ -531,7 +531,7 @@
             </option>
           </options>
         </configuration>
-      </plugin>
+      </plugin> -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
